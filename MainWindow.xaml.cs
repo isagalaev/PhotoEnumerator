@@ -65,15 +65,45 @@ namespace PhotoEnumerator
         }
     }
 
+    public class Rename
+    {
+        public PictureInfo Picture { get; set; }
+        public string OldName { get; set; }
+        public string NewName { get; set; }
+    }
+
     public partial class MainWindow : Window
     {
 
         private ObservableCollection<Source> sources = new ObservableCollection<Source>();
 
+        private IEnumerable<Rename> Renames(string format, int counter)
+        {
+            foreach (var source in sources)
+            {
+                foreach (var picture in source.Pictures)
+                {
+                    yield return new Rename()
+                    {
+                        Picture = picture,
+                        OldName = Path.GetFileName(picture.Name),
+                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(format), counter)
+                    };
+                    counter++;
+                }
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             icSources.ItemsSource = sources;
+            sources.CollectionChanged += sources_CollectionChanged;
+        }
+
+        void sources_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            lvTarget.ItemsSource = Renames("yyyy-MM-dd_", 1);
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)

@@ -27,8 +27,26 @@
                 <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
             </WrapPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1">
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <TextBlock Text="Target"/>
-        </StackPanel>
+            <ListView Name="lvTarget" Grid.Row="1">
+                <ListView.Resources>
+                    <Style TargetType="{x:Type GridViewColumnHeader}">
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    </Style>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Old name" DisplayMemberBinding="{Binding OldName}"/>
+                        <GridViewColumn Header="New name" DisplayMemberBinding="{Binding NewName}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
     </Grid>
 </Window>
