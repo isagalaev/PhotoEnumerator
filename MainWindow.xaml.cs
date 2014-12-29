@@ -86,7 +86,7 @@ namespace PhotoEnumerator
                 var filenames = from f in dialog.FileNames
                                 where !sources.Any(s => s.Contains(f))
                                 select f;
-                if (filenames.Count() > 0)
+                if (filenames.Any())
                 {
                     sources.Add(new Source(filenames));
                 }
