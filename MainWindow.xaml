@@ -1,0 +1,34 @@
+﻿<Window x:Class="PhotoEnumerator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="450" Width="700">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,10,0">
+            <TextBlock Text="Sources"/>
+            <ItemsControl Name="icSources">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Title}"/>
+                            <WrapPanel>
+                                <TextBlock Text="{Binding Count}"/>
+                                <TextBlock Text=" photos"/>
+                            </WrapPanel>
+                            <TextBlock Text="{Binding Camera}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <WrapPanel>
+                <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
+            </WrapPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <TextBlock Text="Target"/>
+        </StackPanel>
+    </Grid>
+</Window>
