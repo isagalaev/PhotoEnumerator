@@ -30,11 +30,16 @@
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Target"/>
-            <ListView Name="lvTarget" Grid.Row="1">
+            <DockPanel Grid.Row="1">
+                <Button Name="btnTargetDirectory" DockPanel.Dock="Right" Width="70" Content="Choose" Click="btnTargetDirectory_Click"/>
+                <TextBox Name="tbTargetDirectory" Text="{Binding TargetDir}"/>
+            </DockPanel>
+            <ListView Name="lvTarget" Grid.Row="2">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="HorizontalContentAlignment" Value="Left" />

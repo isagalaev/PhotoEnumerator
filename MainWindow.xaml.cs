@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.IO;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 using ExifLib;
 
@@ -77,6 +78,13 @@ namespace PhotoEnumerator
 
         private ObservableCollection<Source> sources = new ObservableCollection<Source>();
 
+        public static readonly DependencyProperty TargetDirProperty = DependencyProperty.Register("TargetDir", typeof(string), typeof(MainWindow));
+        public string TargetDir
+        {
+            get { return (string)GetValue(TargetDirProperty); }
+            set { SetValue(TargetDirProperty, value); }
+        }
+
         private IEnumerable<Rename> Renames(string format, int counter)
         {
             foreach (var source in sources)
@@ -97,6 +105,7 @@ namespace PhotoEnumerator
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             icSources.ItemsSource = sources;
             sources.CollectionChanged += sources_CollectionChanged;
         }
@@ -124,5 +133,14 @@ namespace PhotoEnumerator
 
         }
 
+        private void btnTargetDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                TargetDir = dialog.FileName;
+            }
+        }
     }
 }
