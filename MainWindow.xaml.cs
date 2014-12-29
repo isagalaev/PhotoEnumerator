@@ -38,7 +38,7 @@ namespace PhotoEnumerator
     {
         public List<PictureInfo> Pictures;
 
-        public Source(List<string> filenames)
+        public Source(IEnumerable<string> filenames)
         {
             Pictures = (from filename in filenames select new PictureInfo(filename)).ToList();
             Pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
@@ -57,6 +57,11 @@ namespace PhotoEnumerator
         public int Count
         {
             get { return Pictures.Count; }
+        }
+
+        public bool Contains(string filename)
+        {
+            return Pictures.Find(p => p.Name == filename) != null;
         }
     }
 
@@ -78,7 +83,13 @@ namespace PhotoEnumerator
             dialog.Multiselect = true;
             if (dialog.ShowDialog() == true) 
             {
-                sources.Add(new Source(dialog.FileNames.ToList()));
+                var filenames = from f in dialog.FileNames
+                                where !sources.Any(s => s.Contains(f))
+                                select f;
+                if (filenames.Count() > 0)
+                {
+                    sources.Add(new Source(filenames));
+                }
             }
 
         }
