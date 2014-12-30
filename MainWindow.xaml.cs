@@ -142,7 +142,7 @@ namespace PhotoEnumerator
                     {
                         Picture = picture,
                         OldName = Path.GetFileName(picture.Name),
-                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter),
+                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask.Replace(@"\", @"\\")), counter),
                         TargetDir = TargetDir
                     };
                     counter++;
