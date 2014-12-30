@@ -1,7 +1,11 @@
 ﻿<Window x:Class="PhotoEnumerator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:PhotoEnumerator"
         Title="MainWindow" Height="450" Width="700">
+    <Window.CommandBindings>
+        <CommandBinding Command="local:MainWindow.Run" CanExecute="Run_CanExecute" Executed="Run_Executed" />
+    </Window.CommandBindings>
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -34,6 +38,7 @@
                 <Label Content="Counter start"/>
                 <TextBox Name="tbCounter" Width="30" Text="{Binding Counter}"/>
             </WrapPanel>
+            <Button Content="Run" Command="local:MainWindow.Run"/>
         </StackPanel>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>

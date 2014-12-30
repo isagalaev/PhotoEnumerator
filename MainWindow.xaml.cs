@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -155,6 +156,19 @@ namespace PhotoEnumerator
             get { return Renames.Any(r => r.Conflict); }
         }
 
+        public void Run()
+        {
+            foreach (var rename in Renames)
+            {
+                var targetName = Path.Combine(rename.TargetDir, rename.NewName);
+                var targetDir = Path.GetDirectoryName(targetName);
+                if (!Directory.Exists(targetDir))
+                    Directory.CreateDirectory(targetDir);
+                File.Copy(rename.Picture.Name, targetName, false);
+            }
+            OnPropertyChanged("Renames");
+        }
+
         public MainWindowViewModel()
         {
             Sources = new ObservableCollection<Source>();
@@ -171,6 +185,8 @@ namespace PhotoEnumerator
     public partial class MainWindow : Window
     {
         private MainWindowViewModel Data;
+
+        public static readonly RoutedUICommand Run = new RoutedUICommand("Run", "Run", typeof(MainWindow));
 
         public MainWindow()
         {
@@ -206,5 +222,16 @@ namespace PhotoEnumerator
                 Data.TargetDir = dialog.FileName;
             }
         }
+
+        private void Run_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Data != null ? Data.Renames.Any() && !Data.Conflict : false;
+        }
+
+        private void Run_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Data.Run();
+        }
+
     }
 }
