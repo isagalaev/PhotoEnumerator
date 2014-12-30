@@ -15,16 +15,18 @@ namespace PhotoEnumerator
 {
     public class PictureInfo
     {
-        public string Name;
-        public DateTime Time;
-        public string Camera;
+        public string Name { get; set; }
+        public DateTime Time { get; set; }
+        public string Camera { get; set; }
 
         public PictureInfo(string filename)
         {
             Name = filename;
             using (var reader = new ExifReader(filename))
             {
-                reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized, out Time);
+                DateTime time;
+                reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized, out time);
+                Time = time;
                 string make, model;
                 reader.GetTagValue<string>(ExifTags.Make, out make);
                 reader.GetTagValue<string>(ExifTags.Model, out model);

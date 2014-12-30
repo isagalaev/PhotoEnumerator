@@ -60,6 +60,10 @@
                     </GridView>
                 </ListView.View>
             </ListView>
+            <StackPanel Grid.Row="3">
+                <TextBlock Text="{Binding SelectedItem.Picture.Time, ElementName=lvTarget, StringFormat=yyyy-MM-dd hh:mm:ss}"/>
+                <Image Source="{Binding SelectedItem.Picture.Name, ElementName=lvTarget}" Height="200"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>
