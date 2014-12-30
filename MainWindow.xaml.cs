@@ -123,19 +123,18 @@ namespace PhotoEnumerator
         {
             get
             {
+                var pictures = Sources.SelectMany(s => s.Pictures).ToList();
+                pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
                 var counter = Counter;
-                foreach (var source in Sources)
+                foreach (var picture in pictures)
                 {
-                    foreach (var picture in source.Pictures)
+                    yield return new Rename()
                     {
-                        yield return new Rename()
-                        {
-                            Picture = picture,
-                            OldName = Path.GetFileName(picture.Name),
-                            NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter)
-                        };
-                        counter++;
-                    }
+                        Picture = picture,
+                        OldName = Path.GetFileName(picture.Name),
+                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter)
+                    };
+                    counter++;
                 }
             }
         }
