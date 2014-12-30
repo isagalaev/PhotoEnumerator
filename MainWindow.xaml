@@ -2,31 +2,43 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PhotoEnumerator"
-        Title="MainWindow" Height="450" Width="700">
+        Title="Фотогрыз" Height="600" Width="700">
     <Window.CommandBindings>
         <CommandBinding Command="local:MainWindow.Run" CanExecute="Run_CanExecute" Executed="Run_Executed" />
     </Window.CommandBindings>
-    <Grid Margin="10">
+    <Window.Resources>
+        <Style x:Key="Header" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,20,0,10"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Margin="0,0,10,0">
-            <TextBlock Text="Sources"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Фотогрыз" FontSize="36" FontWeight="Bold" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Padding="10"/>
+        <StackPanel Margin="10,0,10,10" Grid.Row="1" Grid.Column="0">
+            <TextBlock Text="Sources" Style="{StaticResource Header}"/>
             <ItemsControl Name="icSources" ItemsSource="{Binding Sources}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBlock Text="{Binding Title}"/>
-                            <WrapPanel>
+                            <TextBlock Text="{Binding Title}" Margin="0,0,0,10" FontWeight="Bold"/>
+                            <WrapPanel Margin="20,0,0,10">
                                 <TextBlock Text="{Binding Count}"/>
-                                <TextBlock Text=" photos"/>
+                                <TextBlock Text=" photos, "/>
+                                <TextBlock Text="{Binding Camera}"/>
                             </WrapPanel>
-                            <TextBlock Text="{Binding Camera}"/>
-                            <WrapPanel>
-                                <TextBlock Text="Time shift"/>
-                                <TextBox Text="{Binding TimeShift}" Width="70"/>
-                            </WrapPanel>
+                            <DockPanel Margin="20,0,0,10">
+                                <TextBlock Text="Time shift" Width="100" DockPanel.Dock="Left"/>
+                                <TextBox Text="{Binding TimeShift}" />
+                            </DockPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -34,28 +46,35 @@
             <WrapPanel>
                 <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
             </WrapPanel>
-            <WrapPanel>
-                <Label Content="Mask"/>
-                <TextBox Name="tbMask" Width="200" Text="{Binding Mask}"/>
-            </WrapPanel>
-            <WrapPanel>
-                <Label Content="Counter start"/>
+            <TextBlock Text="Parameters" Style="{StaticResource Header}"/>
+            <DockPanel Margin="20,0,0,10">
+                <TextBlock Text="Mask" Width="100" DockPanel.Dock="Left"/>
+                <TextBox Name="tbMask" Text="{Binding Mask}"/>
+            </DockPanel>
+            <WrapPanel Margin="20,0,0,10">
+                <TextBlock Text="Counter start" Width="100"/>
                 <TextBox Name="tbCounter" Width="30" Text="{Binding Counter}"/>
             </WrapPanel>
-            <Button Content="Run" Command="local:MainWindow.Run"/>
+            <Button Content="Run" Command="local:MainWindow.Run" FontSize="24" FontWeight="Bold" Margin="0,10,0,10"/>
         </StackPanel>
-        <Grid Grid.Column="1">
+        <Grid Grid.Row="1" Grid.Column="1" Margin="10,0,10,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Target"/>
-            <DockPanel Grid.Row="1">
-                <Button Name="btnTargetDirectory" DockPanel.Dock="Right" Width="70" Content="Choose" Click="btnTargetDirectory_Click"/>
-                <TextBox Name="tbTargetDirectory" Text="{Binding TargetDir}"/>
-            </DockPanel>
+            <TextBlock Grid.Row="0" Text="Destination" Style="{StaticResource Header}"/>
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="70"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Directory"/>
+                <TextBox Grid.Column="1" Margin="10,0,10,0" Name="tbTargetDirectory" Text="{Binding TargetDir}"/>
+                <Button Grid.Column="2" Name="btnTargetDirectory" Content="Choose" Click="btnTargetDirectory_Click"/>
+            </Grid>
             <ListView Name="lvTarget" Grid.Row="2" ItemsSource="{Binding Renames}">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
@@ -77,8 +96,14 @@
                 </ListView.View>
             </ListView>
             <StackPanel Grid.Row="3">
-                <TextBlock Text="{Binding SelectedItem.Picture.Time, ElementName=lvTarget, StringFormat=yyyy-MM-dd hh:mm:ss}"/>
-                <Image Source="{Binding SelectedItem.Picture.Name, ElementName=lvTarget}" Height="200"/>
+                <TextBlock Text="Picture" Style="{StaticResource Header}"/>
+                <WrapPanel Margin="0,0,0,10">
+                    <TextBlock Text="Time: "/>
+                    <TextBlock Text="{Binding SelectedItem.Picture.Time, ElementName=lvTarget, StringFormat=yyyy-MM-dd hh:mm:ss}"/>
+                </WrapPanel>
+                <StackPanel Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                    <Image Source="{Binding SelectedItem.Picture.Name, ElementName=lvTarget}" Height="200"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>
