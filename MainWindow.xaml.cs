@@ -74,6 +74,15 @@ namespace PhotoEnumerator
         public PictureInfo Picture { get; set; }
         public string OldName { get; set; }
         public string NewName { get; set; }
+        public string TargetDir;
+
+        public bool Conflict
+        {
+            get
+            {
+                return File.Exists(Path.Combine(TargetDir, NewName));
+            }
+        }
     }
 
     public class MainWindowViewModel : INotifyPropertyChanged
@@ -123,6 +132,7 @@ namespace PhotoEnumerator
         {
             get
             {
+                if (TargetDir == null) yield break;
                 var pictures = Sources.SelectMany(s => s.Pictures).ToList();
                 pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
                 var counter = Counter;
@@ -132,11 +142,17 @@ namespace PhotoEnumerator
                     {
                         Picture = picture,
                         OldName = Path.GetFileName(picture.Name),
-                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter)
+                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter),
+                        TargetDir = TargetDir
                     };
                     counter++;
                 }
             }
+        }
+
+        public bool Conflict
+        {
+            get { return Renames.Any(r => r.Conflict); }
         }
 
         public MainWindowViewModel()
