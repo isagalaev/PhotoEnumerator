@@ -9,7 +9,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel Margin="0,0,10,0">
             <TextBlock Text="Sources"/>
-            <ItemsControl Name="icSources">
+            <ItemsControl Name="icSources" ItemsSource="{Binding Sources}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -26,6 +26,14 @@
             <WrapPanel>
                 <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
             </WrapPanel>
+            <WrapPanel>
+                <Label Content="Mask"/>
+                <TextBox Name="tbMask" Width="200" Text="{Binding Mask}"/>
+            </WrapPanel>
+            <WrapPanel>
+                <Label Content="Counter start"/>
+                <TextBox Name="tbCounter" Width="30" Text="{Binding Counter}"/>
+            </WrapPanel>
         </StackPanel>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -39,7 +47,7 @@
                 <Button Name="btnTargetDirectory" DockPanel.Dock="Right" Width="70" Content="Choose" Click="btnTargetDirectory_Click"/>
                 <TextBox Name="tbTargetDirectory" Text="{Binding TargetDir}"/>
             </DockPanel>
-            <ListView Name="lvTarget" Grid.Row="2">
+            <ListView Name="lvTarget" Grid.Row="2" ItemsSource="{Binding Renames}">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="HorizontalContentAlignment" Value="Left" />

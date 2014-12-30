@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.IO;
@@ -73,46 +74,92 @@ namespace PhotoEnumerator
         public string NewName { get; set; }
     }
 
-    public partial class MainWindow : Window
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
+        public ObservableCollection<Source> Sources { get; set; }
 
-        private ObservableCollection<Source> sources = new ObservableCollection<Source>();
-
-        public static readonly DependencyProperty TargetDirProperty = DependencyProperty.Register("TargetDir", typeof(string), typeof(MainWindow));
+        private string _TargetDir;
         public string TargetDir
         {
-            get { return (string)GetValue(TargetDirProperty); }
-            set { SetValue(TargetDirProperty, value); }
+            get { return _TargetDir; }
+            set
+            {
+                if (value == _TargetDir) return;
+                _TargetDir = value;
+                OnPropertyChanged("TargetDir");
+                OnPropertyChanged("Renames");
+            }
         }
 
-        private IEnumerable<Rename> Renames(string format, int counter)
+        private string _Mask = "yyyy-MM-dd_";
+        public string Mask
         {
-            foreach (var source in sources)
+            get { return _Mask; }
+            set
             {
-                foreach (var picture in source.Pictures)
+                if (value == _Mask) return;
+                _Mask = value;
+                OnPropertyChanged("Mask");
+                OnPropertyChanged("Renames");
+            }
+        }
+
+        private int _Counter = 1;
+        public int Counter
+        {
+            get { return _Counter; }
+            set
+            {
+                if (value == _Counter) return;
+                _Counter = value;
+                OnPropertyChanged("Counter");
+                OnPropertyChanged("Renames");
+            }
+        }
+
+        public IEnumerable<Rename> Renames
+        {
+            get
+            {
+                var counter = Counter;
+                foreach (var source in Sources)
                 {
-                    yield return new Rename()
+                    foreach (var picture in source.Pictures)
                     {
-                        Picture = picture,
-                        OldName = Path.GetFileName(picture.Name),
-                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(format), counter)
-                    };
-                    counter++;
+                        yield return new Rename()
+                        {
+                            Picture = picture,
+                            OldName = Path.GetFileName(picture.Name),
+                            NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask), counter)
+                        };
+                        counter++;
+                    }
                 }
             }
         }
 
+        public MainWindowViewModel()
+        {
+            Sources = new ObservableCollection<Source>();
+            Sources.CollectionChanged += (sender, args) => { OnPropertyChanged("Sources"); OnPropertyChanged("Renames"); };
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public partial class MainWindow : Window
+    {
+        private MainWindowViewModel Data;
+
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
-            icSources.ItemsSource = sources;
-            sources.CollectionChanged += sources_CollectionChanged;
-        }
-
-        void sources_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            lvTarget.ItemsSource = Renames("yyyy-MM-dd_", 1);
+            Data = new MainWindowViewModel();
+            DataContext = Data;
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -120,14 +167,14 @@ namespace PhotoEnumerator
             var dialog = new OpenFileDialog();
             dialog.Filter = "Pictures|*.jpeg;*.jpg";
             dialog.Multiselect = true;
-            if (dialog.ShowDialog() == true) 
+            if (dialog.ShowDialog() == true)
             {
                 var filenames = from f in dialog.FileNames
-                                where !sources.Any(s => s.Contains(f))
+                                where !Data.Sources.Any(s => s.Contains(f))
                                 select f;
                 if (filenames.Any())
                 {
-                    sources.Add(new Source(filenames));
+                    Data.Sources.Add(new Source(filenames));
                 }
             }
 
@@ -139,7 +186,7 @@ namespace PhotoEnumerator
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                TargetDir = dialog.FileName;
+                Data.TargetDir = dialog.FileName;
             }
         }
     }
