@@ -23,6 +23,10 @@
                                 <TextBlock Text=" photos"/>
                             </WrapPanel>
                             <TextBlock Text="{Binding Camera}"/>
+                            <WrapPanel>
+                                <TextBlock Text="Time shift"/>
+                                <TextBox Text="{Binding TimeShift}" Width="70"/>
+                            </WrapPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

@@ -10,24 +10,25 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using ExifLib;
-
+using ExifLibrary;
 
 namespace PhotoEnumerator
 {
     public class PictureInfo
     {
         public string Name { get; set; }
-        public DateTime Time { get; set; }
+        private DateTime time;
+        public DateTime Time { get { return time + TimeShift; } }
+        public TimeSpan TimeShift;
         public string Camera { get; set; }
 
         public PictureInfo(string filename)
         {
             Name = filename;
+            TimeShift = new TimeSpan();
             using (var reader = new ExifReader(filename))
             {
-                DateTime time;
-                reader.GetTagValue<DateTime>(ExifTags.DateTimeDigitized, out time);
-                Time = time;
+                reader.GetTagValue<DateTime>(ExifTags.DateTime, out time);
                 string make, model;
                 reader.GetTagValue<string>(ExifTags.Make, out make);
                 reader.GetTagValue<string>(ExifTags.Model, out model);
@@ -39,7 +40,7 @@ namespace PhotoEnumerator
         }
     }
 
-    public class Source
+    public class Source : INotifyPropertyChanged
     {
         public List<PictureInfo> Pictures;
 
@@ -47,6 +48,7 @@ namespace PhotoEnumerator
         {
             Pictures = (from filename in filenames select new PictureInfo(filename)).ToList();
             Pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
+            TimeShift = new TimeSpan();
         }
 
         public string Title
@@ -59,6 +61,16 @@ namespace PhotoEnumerator
             get { return Pictures[0].Camera ?? "<Unknown camera>"; }
         }
 
+        public TimeSpan TimeShift 
+        {
+            get { return Pictures[0].TimeShift; }
+            set
+            {
+                Pictures.ForEach(p => { p.TimeShift = value; });
+                OnPropertyChanged("TimeShift");
+            }
+        }
+
         public int Count
         {
             get { return Pictures.Count; }
@@ -67,6 +79,12 @@ namespace PhotoEnumerator
         public bool Contains(string filename)
         {
             return Pictures.Find(p => p.Name == filename) != null;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -165,14 +183,30 @@ namespace PhotoEnumerator
                 if (!Directory.Exists(targetDir))
                     Directory.CreateDirectory(targetDir);
                 File.Copy(rename.Picture.Name, targetName, false);
+                if (rename.Picture.TimeShift != TimeSpan.Zero)
+                {
+                    ImageFile file = ImageFile.FromFile(targetName);
+                    file.Properties.Set(ExifTag.DateTime, rename.Picture.Time);
+                    file.Properties.Set(ExifTag.DateTimeOriginal, rename.Picture.Time);
+                    file.Properties.Set(ExifTag.DateTimeDigitized, rename.Picture.Time);
+                    file.Save(targetName);
+                }
             }
+            OnPropertyChanged("Renames");
+        }
+
+        private void SourcesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+            if (args.NewItems != null)
+                foreach (var newItem in args.NewItems)
+                    (newItem as Source).PropertyChanged += (s, a) => { OnPropertyChanged("Renames"); };
+            OnPropertyChanged("Sources");
             OnPropertyChanged("Renames");
         }
 
         public MainWindowViewModel()
         {
             Sources = new ObservableCollection<Source>();
-            Sources.CollectionChanged += (sender, args) => { OnPropertyChanged("Sources"); OnPropertyChanged("Renames"); };
+            Sources.CollectionChanged += SourcesChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
