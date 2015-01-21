@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PhotoEnumerator"
         Title="Фотогрыз" Height="600" Width="800"
-        Closing="MainWindow_Closing">
+        Closing="MainWindow_Closing" Icon="PE_MAINICON.ico">
     <Window.CommandBindings>
         <CommandBinding Command="local:MainWindow.Run" CanExecute="Run_CanExecute" Executed="Run_Executed" />
         <CommandBinding Command="local:MainWindow.Clear" CanExecute="Clear_CanExecute" Executed="Clear_Executed" />
