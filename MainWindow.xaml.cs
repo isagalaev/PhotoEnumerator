@@ -21,11 +21,13 @@ namespace PhotoEnumerator
         public DateTime Time { get { return time + TimeShift; } }
         public TimeSpan TimeShift;
         public string Camera { get; set; }
+        public Source Source { get; set; }
 
-        public PictureInfo(string filename)
+        public PictureInfo(string filename, Source source)
         {
             Name = filename;
             TimeShift = new TimeSpan();
+            Source = source;
             using (var reader = new ExifReader(filename))
             {
                 reader.GetTagValue<DateTime>(ExifTags.DateTime, out time);
@@ -44,16 +46,19 @@ namespace PhotoEnumerator
     {
         public List<PictureInfo> Pictures;
 
-        public Source(IEnumerable<string> filenames)
+        public int Index { get; set; }
+
+        public Source(IEnumerable<string> filenames, int index)
         {
-            Pictures = (from filename in filenames select new PictureInfo(filename)).ToList();
+            Pictures = (from filename in filenames select new PictureInfo(filename, this)).ToList();
             Pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
             TimeShift = new TimeSpan();
+            Index = index;
         }
 
         public string Title
         {
-            get { return Path.GetDirectoryName(Pictures[0].Name); }
+            get { return String.Format("{0} - {1}", Index, Path.GetDirectoryName(Pictures[0].Name)); }
         }
 
         public string Camera
@@ -236,7 +241,7 @@ namespace PhotoEnumerator
                                 select f;
                 if (filenames.Any())
                 {
-                    Data.Sources.Add(new Source(filenames));
+                    Data.Sources.Add(new Source(filenames, Data.Sources.Count + 1));
                 }
             }
 

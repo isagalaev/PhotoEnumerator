@@ -88,6 +88,7 @@
                 </ListView.Resources>
                 <ListView.View>
                     <GridView>
+                        <GridViewColumn Header="Source" DisplayMemberBinding="{Binding Picture.Source.Index}"/>
                         <GridViewColumn Header="Old name" DisplayMemberBinding="{Binding OldName}"/>
                         <GridViewColumn Header="New name" DisplayMemberBinding="{Binding NewName}"/>
                     </GridView>
