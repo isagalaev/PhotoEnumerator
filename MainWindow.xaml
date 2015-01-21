@@ -53,10 +53,6 @@
                 <TextBlock Text="Mask" Width="100" DockPanel.Dock="Left"/>
                 <TextBox Name="tbMask" Text="{Binding Mask}"/>
             </DockPanel>
-            <WrapPanel Margin="20,0,0,10">
-                <TextBlock Text="Counter start" Width="100"/>
-                <TextBox Name="tbCounter" Width="30" Text="{Binding Counter}"/>
-            </WrapPanel>
             <Button Content="Run" Command="local:MainWindow.Run" FontSize="24" FontWeight="Bold" Margin="0,10,0,10"/>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="1" Margin="10,0,10,10">

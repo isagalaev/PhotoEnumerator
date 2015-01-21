@@ -135,36 +135,28 @@ namespace PhotoEnumerator
             }
         }
 
-        private int _Counter = 1;
-        public int Counter
-        {
-            get { return _Counter; }
-            set
-            {
-                if (value == _Counter) return;
-                _Counter = value;
-                OnPropertyChanged("Counter");
-                OnPropertyChanged("Renames");
-            }
-        }
-
         public IEnumerable<Rename> Renames
         {
             get
             {
                 var pictures = Sources.SelectMany(s => s.Pictures).ToList();
                 pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
-                var counter = Counter;
+                DateTime? currentDay = null;
+                var counter = 0;
                 foreach (var picture in pictures)
                 {
+                    if (picture.Time.Date != currentDay)
+                    {
+                        currentDay = picture.Time.Date;
+                        counter = 1;
+                    }
                     yield return new Rename()
                     {
                         Picture = picture,
                         OldName = Path.GetFileName(picture.Name),
-                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask.Replace(@"\", @"\\")), counter),
+                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask.Replace(@"\", @"\\")), counter++),
                         TargetDir = TargetDir
                     };
-                    counter++;
                 }
             }
         }
