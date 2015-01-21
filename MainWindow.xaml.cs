@@ -122,7 +122,7 @@ namespace PhotoEnumerator
             }
         }
 
-        private string _Mask = "yyyy-MM-dd_";
+        private string _Mask = "";
         public string Mask
         {
             get { return _Mask; }
@@ -219,6 +219,8 @@ namespace PhotoEnumerator
         {
             InitializeComponent();
             Data = new MainWindowViewModel();
+            Data.TargetDir = Properties.Settings.Default.TargetDir;
+            Data.Mask = Properties.Settings.Default.Mask;
             DataContext = Data;
         }
 
@@ -268,6 +270,13 @@ namespace PhotoEnumerator
         private void Run_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Data.Run();
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            Properties.Settings.Default.TargetDir = Data.TargetDir;
+            Properties.Settings.Default.Mask = Data.Mask;
+            Properties.Settings.Default.Save();
         }
 
     }
