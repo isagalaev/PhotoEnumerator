@@ -95,10 +95,11 @@ namespace PhotoEnumerator
         public string NewName { get; set; }
         public string TargetDir;
 
-        public bool Conflict
+        public bool? Conflict
         {
             get
             {
+                if (TargetDir == null) return null;
                 return File.Exists(Path.Combine(TargetDir, NewName));
             }
         }
@@ -151,7 +152,6 @@ namespace PhotoEnumerator
         {
             get
             {
-                if (TargetDir == null) yield break;
                 var pictures = Sources.SelectMany(s => s.Pictures).ToList();
                 pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
                 var counter = Counter;
@@ -171,7 +171,7 @@ namespace PhotoEnumerator
 
         public bool Conflict
         {
-            get { return Renames.Any(r => r.Conflict); }
+            get { return Renames.Any(r => r.Conflict != false); }
         }
 
         public void Run()
