@@ -221,6 +221,7 @@ namespace PhotoEnumerator
         private MainWindowViewModel Data;
 
         public static readonly RoutedUICommand Run = new RoutedUICommand("Run", "Run", typeof(MainWindow));
+        public static readonly RoutedUICommand Clear = new RoutedUICommand("Clear", "Clear", typeof(MainWindow));
 
         public MainWindow()
         {
@@ -245,6 +246,16 @@ namespace PhotoEnumerator
                 }
             }
 
+        }
+
+        private void Clear_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Data != null ? Data.Sources.Count > 0 : false;
+        }
+
+        private void Clear_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Data.Sources.Clear();
         }
 
         private void btnTargetDirectory_Click(object sender, RoutedEventArgs e)
