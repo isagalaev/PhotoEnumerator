@@ -219,6 +219,7 @@ namespace PhotoEnumerator
 
         public static readonly RoutedUICommand Run = new RoutedUICommand("Run", "Run", typeof(MainWindow));
         public static readonly RoutedUICommand Clear = new RoutedUICommand("Clear", "Clear", typeof(MainWindow));
+        private Point _mousePos;
 
         public MainWindow()
         {
@@ -265,6 +266,38 @@ namespace PhotoEnumerator
             {
                 Data.TargetDir = dialog.FileName;
             }
+        }
+
+        private void lvTarget_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _mousePos = e.GetPosition(null);
+        }
+
+        private void lvTarget_MouseMove(object sender, MouseEventArgs e)
+        {
+            Vector distance = e.GetPosition(null) - _mousePos;
+            if (e.LeftButton == MouseButtonState.Pressed && 
+                (Math.Abs(distance.X) >= SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(distance.Y) >= SystemParameters.MinimumVerticalDragDistance)) 
+            {
+                DragDrop.DoDragDrop(
+                    (DependencyObject)e.OriginalSource, 
+                    new DataObject("Rename", lvTarget.SelectedItem), 
+                    DragDropEffects.Move
+                );
+            }
+        }
+
+        private void lvTarget_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = e.Data.GetDataPresent("Rename") ? DragDropEffects.Move : DragDropEffects.None;
+            e.Handled = true;
+        }
+
+        private void lvTarget_Drop(object sender, DragEventArgs e)
+        {
+            e.Data.GetData("Rename");
+            e.Handled = true;
         }
 
         private void Run_CanExecute(object sender, CanExecuteRoutedEventArgs e)

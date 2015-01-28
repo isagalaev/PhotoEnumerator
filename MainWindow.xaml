@@ -84,6 +84,11 @@
                                 <Setter Property="Foreground" Value="Red" />
                             </DataTrigger>
                         </Style.Triggers>
+                        <Setter Property="AllowDrop" Value="True"/>
+                        <EventSetter Event="ListViewItem.MouseDown" Handler="lvTarget_MouseDown"/>
+                        <EventSetter Event="ListViewItem.MouseMove" Handler="lvTarget_MouseMove"/>
+                        <EventSetter Event="ListViewItem.DragOver" Handler="lvTarget_DragOver"/>
+                        <EventSetter Event="ListViewItem.Drop" Handler="lvTarget_Drop"/>
                     </Style>
                 </ListView.Resources>
                 <ListView.View>
