@@ -52,7 +52,7 @@
             <TextBlock Text="Parameters" Style="{StaticResource Header}"/>
             <DockPanel Margin="0,0,0,10">
                 <TextBlock Text="Mask" Width="60" DockPanel.Dock="Left"/>
-                <TextBox Name="tbMask" Text="{Binding Mask}"/>
+                <TextBox Name="tbMask" Text="{Binding Mask, UpdateSourceTrigger=PropertyChanged}"/>
             </DockPanel>
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
@@ -61,7 +61,7 @@
                     <ColumnDefinition Width="70"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Directory"/>
-                <TextBox Grid.Column="1" Name="tbTargetDirectory" Text="{Binding TargetDir}"/>
+                <TextBox Grid.Column="1" Name="tbTargetDirectory" Text="{Binding TargetDir, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="2" Name="btnTargetDirectory" Margin="10,0,0,0" Content="Choose" Click="btnTargetDirectory_Click"/>
             </Grid>
             <Button Content="Run" Command="local:MainWindow.Run" FontSize="24" FontWeight="Bold" Margin="0,10,0,10"/>
