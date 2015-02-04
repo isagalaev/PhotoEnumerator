@@ -104,7 +104,7 @@
                     <TextBlock Text="Time: "/>
                     <TextBlock Text="{Binding SelectedItem.Picture.Time, ElementName=lvTarget, StringFormat=yyyy-MM-dd hh:mm:ss}"/>
                 </WrapPanel>
-                <StackPanel Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                <StackPanel Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
                     <Image Source="{Binding SelectedItem.Picture.Name, ElementName=lvTarget}" Height="200"/>
                 </StackPanel>
             </StackPanel>
