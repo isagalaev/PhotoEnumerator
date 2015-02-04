@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Mask" Type="System.String" Scope="User">
-      <Value Profile="(Default)">yyyy-MM-dd_</Value>
+      <Value Profile="(Default)">yyyy-MM-dd_n</Value>
     </Setting>
   </Settings>
 </SettingsFile>

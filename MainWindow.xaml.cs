@@ -160,20 +160,25 @@ namespace PhotoEnumerator
         {
             get
             {
-                DateTime? currentDay = null;
                 var counter = 0;
+                var dayCounter = new Dictionary<DateTime, int>();
                 foreach (var picture in OrderedPictures)
                 {
-                    if (picture.Time.Date != currentDay)
+                    if (!dayCounter.ContainsKey(picture.Time.Date))
                     {
-                        currentDay = picture.Time.Date;
-                        counter = 1;
+                        dayCounter[picture.Time.Date] = 0;
                     }
+                    dayCounter[picture.Time.Date] += 1;
+                    counter += 1;
+                    var newName = Mask;
+                    newName = newName.Replace("n", dayCounter[picture.Time.Date].ToString("000"));
+                    newName = newName.Replace("N", counter.ToString("000"));
+                    newName = String.Format("{0}.jpg", picture.Time.ToString(newName.Replace(@"\", @"\\")));
                     yield return new Rename()
                     {
                         Picture = picture,
                         OldName = Path.GetFileName(picture.Name),
-                        NewName = String.Format("{0}{1:D3}.jpg", picture.Time.ToString(Mask.Replace(@"\", @"\\")), counter++),
+                        NewName = newName,
                         TargetDir = TargetDir
                     };
                 }

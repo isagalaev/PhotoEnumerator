@@ -37,7 +37,7 @@ namespace PhotoEnumerator.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("yyyy-MM-dd_")]
+        [global::System.Configuration.DefaultSettingValueAttribute("yyyy-MM-dd_n")]
         public string Mask {
             get {
                 return ((string)(this["Mask"]));
