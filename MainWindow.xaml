@@ -73,7 +73,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Preview" Style="{StaticResource Header}"/>
-            <ListView Name="lvTarget" Grid.Row="1" ItemsSource="{Binding Renames}">
+            <ListView Name="lvTarget" Grid.Row="1" ItemsSource="{Binding Renames}"
+                      AllowDrop="True" DragOver="lvTarget_DragOver" Drop="lvTarget_Drop">
                 <ListView.Resources>
                     <Style TargetType="{x:Type GridViewColumnHeader}">
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -87,8 +88,6 @@
                         <Setter Property="AllowDrop" Value="True"/>
                         <EventSetter Event="ListViewItem.MouseDown" Handler="lvTarget_MouseDown"/>
                         <EventSetter Event="ListViewItem.MouseMove" Handler="lvTarget_MouseMove"/>
-                        <EventSetter Event="ListViewItem.DragOver" Handler="lvTarget_DragOver"/>
-                        <EventSetter Event="ListViewItem.Drop" Handler="lvTarget_Drop"/>
                     </Style>
                 </ListView.Resources>
                 <ListView.View>

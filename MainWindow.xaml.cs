@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -113,6 +115,7 @@ namespace PhotoEnumerator
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<Source> Sources { get; set; }
+        private List<PictureInfo> OrderedPictures;
 
         private string _TargetDir;
         public string TargetDir
@@ -140,15 +143,26 @@ namespace PhotoEnumerator
             }
         }
 
+        private void OrderPictures()
+        {
+            OrderedPictures = Sources.SelectMany(s => s.Pictures).ToList();
+            OrderedPictures.Sort((a, b) => a.Time.CompareTo(b.Time));
+        }
+
+        public void MoveRename(Rename rename, int index)
+        {
+            OrderedPictures.Remove(rename.Picture);
+            OrderedPictures.Insert(index, rename.Picture);
+            OnPropertyChanged("Renames");
+        }
+
         public IEnumerable<Rename> Renames
         {
             get
             {
-                var pictures = Sources.SelectMany(s => s.Pictures).ToList();
-                pictures.Sort((a, b) => a.Time.CompareTo(b.Time));
                 DateTime? currentDay = null;
                 var counter = 0;
-                foreach (var picture in pictures)
+                foreach (var picture in OrderedPictures)
                 {
                     if (picture.Time.Date != currentDay)
                     {
@@ -195,14 +209,15 @@ namespace PhotoEnumerator
         private void SourcesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
             if (args.NewItems != null)
                 foreach (var newItem in args.NewItems)
-                    (newItem as Source).PropertyChanged += (s, a) => { OnPropertyChanged("Renames"); };
-            OnPropertyChanged("Sources");
+                    (newItem as Source).PropertyChanged += (s, a) => { OrderPictures();  OnPropertyChanged("Renames"); };
+            OrderPictures();
             OnPropertyChanged("Renames");
         }
 
         public MainWindowViewModel()
         {
             Sources = new ObservableCollection<Source>();
+            OrderPictures();
             Sources.CollectionChanged += SourcesChanged;
         }
 
@@ -296,7 +311,18 @@ namespace PhotoEnumerator
 
         private void lvTarget_Drop(object sender, DragEventArgs e)
         {
-            e.Data.GetData("Rename");
+            var source = e.Data.GetData("Rename") as Rename;
+
+            var element = e.OriginalSource as UIElement;
+            var container = element as ListViewItem;
+            while ((container == null) && (element != null))
+            {
+                element = VisualTreeHelper.GetParent(element) as UIElement;
+                container = element as ListViewItem;
+            }
+            var index = lvTarget.ItemContainerGenerator.IndexFromContainer(container);
+
+            Data.MoveRename(source, index);
             e.Handled = true;
         }
 
