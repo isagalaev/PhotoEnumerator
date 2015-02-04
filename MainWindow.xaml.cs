@@ -30,7 +30,7 @@ namespace PhotoEnumerator
             Source = source;
             using (var reader = new ExifReader(filename))
             {
-                reader.GetTagValue<DateTime>(ExifTags.DateTime, out time);
+                reader.GetTagValue<DateTime>(ExifTags.DateTimeOriginal, out time);
                 string make, model;
                 reader.GetTagValue<string>(ExifTags.Make, out make);
                 reader.GetTagValue<string>(ExifTags.Model, out model);
