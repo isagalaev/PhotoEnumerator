@@ -328,6 +328,7 @@ namespace PhotoEnumerator
             var index = lvTarget.ItemContainerGenerator.IndexFromContainer(container);
 
             Data.MoveRename(source, index);
+            lvTarget.SelectedIndex = index;
             e.Handled = true;
         }
 
