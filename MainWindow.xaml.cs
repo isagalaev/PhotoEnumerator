@@ -115,6 +115,31 @@ namespace PhotoEnumerator
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<Source> Sources { get; set; }
+
+        public void AddSource(IEnumerable<string> paths)
+        {
+            string[] extensions = { ".jpg", ".jpeg" };
+
+            var filenames = new List<string>();
+            foreach (var path in paths) {
+                var attr = File.GetAttributes(path);
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    filenames.AddRange(from f in Directory.GetFiles(path, "*", SearchOption.AllDirectories)
+                                       where extensions.Any(ext => f.EndsWith(ext)) && !Sources.Any(s => s.Contains(f))
+                                       select f);
+                }
+                else
+                {
+                    filenames.Add(path);
+                }
+            }
+            if (filenames.Any())
+            {
+                Sources.Add(new Source(filenames, Sources.Count + 1));
+            }
+        }
+
         private List<PictureInfo> OrderedPictures;
 
         private string _TargetDir;
@@ -256,15 +281,7 @@ namespace PhotoEnumerator
             dialog.IsFolderPicker = true;
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                string[] extensions = { ".jpg", ".jpeg" };
-                var rawFileNames = Directory.GetFiles(dialog.FileName, "*", SearchOption.AllDirectories);
-                var filenames = from f in rawFileNames
-                                where extensions.Any(ext => f.EndsWith(ext)) && !Data.Sources.Any(s => s.Contains(f))
-                                select f;
-                if (filenames.Any())
-                {
-                    Data.Sources.Add(new Source(filenames, Data.Sources.Count + 1));
-                }
+                Data.AddSource(dialog.FileNames);
             }
 
         }
@@ -348,6 +365,14 @@ namespace PhotoEnumerator
             Properties.Settings.Default.TargetDir = Data.TargetDir;
             Properties.Settings.Default.Mask = Data.Mask;
             Properties.Settings.Default.Save();
+        }
+
+        private void icSources_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                Data.AddSource((string[])e.Data.GetData(DataFormats.FileDrop));
+            }
         }
 
     }

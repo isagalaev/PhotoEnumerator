@@ -26,29 +26,31 @@
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Фотогрыз" FontSize="36" FontWeight="Bold" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Padding="10"/>
         <StackPanel Margin="10,0,10,10" Grid.Row="1" Grid.Column="0">
-            <TextBlock Text="Sources" Style="{StaticResource Header}"/>
-            <ItemsControl Name="icSources" ItemsSource="{Binding Sources}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Title}" Margin="0,0,0,10" FontWeight="Bold"/>
-                            <WrapPanel Margin="20,0,0,10">
-                                <TextBlock Text="{Binding Count}"/>
-                                <TextBlock Text=" photos, "/>
-                                <TextBlock Text="{Binding Camera}"/>
-                            </WrapPanel>
-                            <DockPanel Margin="20,0,0,10">
-                                <TextBlock Text="Time shift" Width="100" DockPanel.Dock="Left"/>
-                                <TextBox Text="{Binding TimeShift}" />
-                            </DockPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <WrapPanel>
-                <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
-                <Button Width="70" Name="btnClear" Command="local:MainWindow.Clear" Margin="10,0,0,0">Clear</Button>
-            </WrapPanel>
+            <StackPanel  Drop="icSources_Drop" AllowDrop="True" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                <TextBlock Text="Sources" Style="{StaticResource Header}"/>
+                <ItemsControl Name="icSources" ItemsSource="{Binding Sources}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" Margin="0,0,0,10" FontWeight="Bold"/>
+                                <WrapPanel Margin="20,0,0,10">
+                                    <TextBlock Text="{Binding Count}"/>
+                                    <TextBlock Text=" photos, "/>
+                                    <TextBlock Text="{Binding Camera}"/>
+                                </WrapPanel>
+                                <DockPanel Margin="20,0,0,10">
+                                    <TextBlock Text="Time shift" Width="100" DockPanel.Dock="Left"/>
+                                    <TextBox Text="{Binding TimeShift}" />
+                                </DockPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <WrapPanel>
+                    <Button Width="70" Name="btnAdd" Click="btnAdd_Click">Add</Button>
+                    <Button Width="70" Name="btnClear" Command="local:MainWindow.Clear" Margin="10,0,0,0">Clear</Button>
+                </WrapPanel>
+            </StackPanel>
             <TextBlock Text="Parameters" Style="{StaticResource Header}"/>
             <DockPanel Margin="0,0,0,10">
                 <TextBlock Text="Mask" Width="60" DockPanel.Dock="Left"/>
