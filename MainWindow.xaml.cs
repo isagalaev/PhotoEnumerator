@@ -252,13 +252,14 @@ namespace PhotoEnumerator
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = "Pictures|*.jpeg;*.jpg";
-            dialog.Multiselect = true;
-            if (dialog.ShowDialog() == true)
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                var filenames = from f in dialog.FileNames
-                                where !Data.Sources.Any(s => s.Contains(f))
+                string[] extensions = { ".jpg", ".jpeg" };
+                var rawFileNames = Directory.GetFiles(dialog.FileName, "*", SearchOption.AllDirectories);
+                var filenames = from f in rawFileNames
+                                where extensions.Any(ext => f.EndsWith(ext)) && !Data.Sources.Any(s => s.Contains(f))
                                 select f;
                 if (filenames.Any())
                 {
