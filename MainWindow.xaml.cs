@@ -215,8 +215,28 @@ namespace PhotoEnumerator
             get { return Renames.Any(r => r.Conflict != false); }
         }
 
-        public void Run()
+        public int RenamesCount
         {
+            get { return OrderedPictures.Count > 0 ? OrderedPictures.Count : 1; } // 1 is to avoid indefinite progress state when everything is 0
+        }
+
+        private int progress = 0;
+        public int Progress
+        {
+            get
+            {
+                return progress;
+            }
+            set
+            {
+                progress = value;
+                OnPropertyChanged("Progress");
+            }
+        }
+
+        private void DoRenames(object sender, DoWorkEventArgs e)
+        {
+            Progress = 0;
             foreach (var rename in Renames)
             {
                 var targetName = Path.Combine(rename.TargetDir, rename.NewName);
@@ -232,8 +252,24 @@ namespace PhotoEnumerator
                     file.Properties.Set(ExifTag.DateTimeDigitized, rename.Picture.Time);
                     file.Save(targetName);
                 }
+                Progress++;
             }
+            
+        }
+
+        private void RenamesCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Progress = 0;
             OnPropertyChanged("Renames");
+        }
+
+        public void Run()
+        {
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += DoRenames;
+            worker.RunWorkerCompleted += RenamesCompleted;
+            worker.RunWorkerAsync();
         }
 
         private void SourcesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
@@ -241,7 +277,9 @@ namespace PhotoEnumerator
                 foreach (var newItem in args.NewItems)
                     (newItem as Source).PropertyChanged += (s, a) => { OrderPictures();  OnPropertyChanged("Renames"); };
             OrderPictures();
+            Progress = 0;
             OnPropertyChanged("Renames");
+            OnPropertyChanged("RenamesCount");
         }
 
         public MainWindowViewModel()
