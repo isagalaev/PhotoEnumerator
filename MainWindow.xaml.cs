@@ -215,6 +215,12 @@ namespace PhotoEnumerator
             get { return Renames.Any(r => r.Conflict != false); }
         }
 
+        private BackgroundWorker worker;
+        public bool InProgress
+        {
+            get { return worker != null && worker.IsBusy; }
+        }
+
         public int RenamesCount
         {
             get { return OrderedPictures.Count > 0 ? OrderedPictures.Count : 1; } // 1 is to avoid indefinite progress state when everything is 0
@@ -236,9 +242,9 @@ namespace PhotoEnumerator
 
         private void DoRenames(object sender, DoWorkEventArgs e)
         {
-            Progress = 0;
             foreach (var rename in Renames)
             {
+                if (worker.CancellationPending) break;
                 var targetName = Path.Combine(rename.TargetDir, rename.NewName);
                 var targetDir = Path.GetDirectoryName(targetName);
                 if (!Directory.Exists(targetDir))
@@ -261,15 +267,23 @@ namespace PhotoEnumerator
         {
             Progress = 0;
             OnPropertyChanged("Renames");
+            CommandManager.InvalidateRequerySuggested();
         }
 
         public void Run()
         {
-            BackgroundWorker worker = new BackgroundWorker();
+            worker = new BackgroundWorker();
             worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
             worker.DoWork += DoRenames;
             worker.RunWorkerCompleted += RenamesCompleted;
             worker.RunWorkerAsync();
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        public void Cancel()
+        {
+            worker.CancelAsync();
         }
 
         private void SourcesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
@@ -301,6 +315,7 @@ namespace PhotoEnumerator
         private MainWindowViewModel Data;
 
         public static readonly RoutedUICommand Run = new RoutedUICommand("Run", "Run", typeof(MainWindow));
+        public static readonly RoutedUICommand Cancel = new RoutedUICommand("Cancel", "Cancel", typeof(MainWindow));
         public static readonly RoutedUICommand Clear = new RoutedUICommand("Clear", "Clear", typeof(MainWindow));
         private Point _mousePos;
 
@@ -390,13 +405,24 @@ namespace PhotoEnumerator
 
         private void Run_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Data != null ? Data.Renames.Any() && !Data.Conflict : false;
+            e.CanExecute = Data != null ? !Data.InProgress && Data.Renames.Any() && !Data.Conflict : false;
         }
 
         private void Run_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Data.Run();
         }
+
+        private void Cancel_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Data != null ? Data.InProgress : false;
+        }
+
+        private void Cancel_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Data.Cancel();
+        }
+
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
