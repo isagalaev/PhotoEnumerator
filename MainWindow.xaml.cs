@@ -220,6 +220,10 @@ namespace PhotoEnumerator
         {
             get { return worker != null && worker.IsBusy; }
         }
+        public bool NotInProgress
+        {
+            get { return !InProgress; }
+        }
 
         public int RenamesCount
         {
@@ -267,6 +271,7 @@ namespace PhotoEnumerator
         {
             Progress = 0;
             OnPropertyChanged("Renames");
+            OnPropertyChanged("NotInProgress");
             CommandManager.InvalidateRequerySuggested();
         }
 
@@ -278,6 +283,7 @@ namespace PhotoEnumerator
             worker.DoWork += DoRenames;
             worker.RunWorkerCompleted += RenamesCompleted;
             worker.RunWorkerAsync();
+            OnPropertyChanged("NotInProgress");
             CommandManager.InvalidateRequerySuggested();
         }
 
