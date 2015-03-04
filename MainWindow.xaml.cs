@@ -204,12 +204,12 @@ namespace PhotoEnumerator
                     }
                     else
                     {
-                        nameConflicts[newName] = rename;
+                        if (TargetDir != null && TargetDir != "")
+                        {
+                            rename.Conflict = File.Exists(Path.Combine(TargetDir, newName));
+                        }
                     }
-                    if (rename.Conflict == null && TargetDir != null)
-                    {
-                        rename.Conflict = File.Exists(Path.Combine(TargetDir, newName));
-                    }
+                    nameConflicts[newName] = rename;
                     yield return rename;
                 }
             }
