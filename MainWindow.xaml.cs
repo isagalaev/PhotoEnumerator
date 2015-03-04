@@ -100,16 +100,7 @@ namespace PhotoEnumerator
         public PictureInfo Picture { get; set; }
         public string OldName { get; set; }
         public string NewName { get; set; }
-        public string TargetDir;
-
-        public bool? Conflict
-        {
-            get
-            {
-                if (TargetDir == null) return null;
-                return File.Exists(Path.Combine(TargetDir, NewName));
-            }
-        }
+        public bool? Conflict { get; set; }
     }
 
     public class MainWindowViewModel : INotifyPropertyChanged
@@ -187,6 +178,7 @@ namespace PhotoEnumerator
             {
                 var counter = 0;
                 var dayCounter = new Dictionary<DateTime, int>();
+                var nameConflicts = new Dictionary<string, Rename>();
                 foreach (var picture in OrderedPictures)
                 {
                     if (!dayCounter.ContainsKey(picture.Time.Date))
@@ -199,13 +191,26 @@ namespace PhotoEnumerator
                     newName = newName.Replace("n", dayCounter[picture.Time.Date].ToString("000"));
                     newName = newName.Replace("N", counter.ToString("000"));
                     newName = String.Format("{0}.jpg", picture.Time.ToString(newName.Replace(@"\", @"\\")));
-                    yield return new Rename()
+                    var rename = new Rename()
                     {
                         Picture = picture,
                         OldName = Path.GetFileName(picture.Name),
-                        NewName = newName,
-                        TargetDir = TargetDir
+                        NewName = newName
                     };
+                    if (nameConflicts.ContainsKey(newName))
+                    {
+                        nameConflicts[newName].Conflict = true;
+                        rename.Conflict = true;
+                    }
+                    else
+                    {
+                        nameConflicts[newName] = rename;
+                    }
+                    if (rename.Conflict == null && TargetDir != null)
+                    {
+                        rename.Conflict = File.Exists(Path.Combine(TargetDir, newName));
+                    }
+                    yield return rename;
                 }
             }
         }
@@ -249,7 +254,7 @@ namespace PhotoEnumerator
             foreach (var rename in Renames)
             {
                 if (worker.CancellationPending) break;
-                var targetName = Path.Combine(rename.TargetDir, rename.NewName);
+                var targetName = Path.Combine(TargetDir, rename.NewName);
                 var targetDir = Path.GetDirectoryName(targetName);
                 if (!Directory.Exists(targetDir))
                     Directory.CreateDirectory(targetDir);
